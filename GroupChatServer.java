@@ -11,6 +11,7 @@ public class GroupChatServer implements Runnable
     public GroupChatServer(Socket sock)
     {
         clientSock = sock;
+        clientList = new ArrayList<PrintWriter>();
     }
 
     public static synchronized boolean addClient(PrintWriter toClientWriter)
@@ -27,8 +28,8 @@ public class GroupChatServer implements Runnable
     {
         for (PrintWriter p : clientList)
         {
-            if (p.equals(fromClientWriter));
-            else    p.println(mesg);
+            if (!p.equals(fromClientWriter))
+                p.println(mesg);
         }
     }
 
@@ -37,8 +38,22 @@ public class GroupChatServer implements Runnable
         try 
         {
             BufferedReader fromSockReader = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
+            
+            //Get the client name
 
+            PrintWriter toSockWriter = new PrintWriter(clientSock.getOutputStream(), true);
 
+            addClient(toSockWriter);
+
+            while (true)
+            {
+                String line = fromSockReader.readLine();
+                if (line == null)
+                {
+                    break;
+                }
+                relayMessage(toSockWriter, line);
+            }
         }
         catch (Exception e)
         {
@@ -49,7 +64,6 @@ public class GroupChatServer implements Runnable
     
     public static void main(String[] args)
     {
-        //Giver server a port to listen to
         if (args.length != 1)
         {
             System.out.println("Usage: java GroupChatServer <server port>");
@@ -58,15 +72,17 @@ public class GroupChatServer implements Runnable
 
         try
         {
-            Client cliSock = null;
+            Socket cliSock = null;
+
+            ServerSocket servSock = new ServerSocket(Integer.parseInt(args[0]));
 
             while (true)
             {
                 try 
                 {
-                    ServerSocket servSock = new ServerSocket(Integer.parseInt(args[0]));
+                    System.out.println("Waiting for a client...");
                     cliSock = servSock.accept();
-                    System.out.println("Client connected");
+                    System.out.println("New client connected");
 
                     Thread child = new Thread(new GroupChatServer(cliSock));
                     child.start();

@@ -8,10 +8,13 @@ class GroupChatClient implements Runnable
     //Writing to socket
     private PrintWriter toSockWriter;
 
-    public GroupChatClient(BufferedReader reader, PrintWriter writer)
+    private String name;
+
+    public GroupChatClient(BufferedReader reader, PrintWriter writer, String name)
     {
         fromUserReader = reader;
         toSockWriter = writer;
+        name = this.name;
     }
 
     public void run()
@@ -71,7 +74,7 @@ class GroupChatClient implements Runnable
             //Prepare to read from keyboard
             BufferedReader fromUserReader = new BufferedReader(new InputStreamReader(System.in));
             //Spawn thread to read from user and write to socket
-            Thread child = new Thread(new GroupChatClient(fromUserReader, toSockWriter));
+            Thread child = new Thread(new GroupChatClient(fromUserReader, toSockWriter, args[2]));
             child.start();
         }
         catch (Exception e)
@@ -101,7 +104,7 @@ class GroupChatClient implements Runnable
                 }
 
                 //Write line to user
-                System.out.println(args[2] +": " + line);
+                System.out.println("Name: " + line);
             }
         }
         catch (Exception e)
