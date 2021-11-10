@@ -36,7 +36,6 @@ public class GroupChatServer implements Runnable
         try 
         {
             BufferedReader fromSockReader = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
-
             PrintWriter toSockWriter = new PrintWriter(clientSock.getOutputStream(), true);
 
             addClient(toSockWriter);
@@ -70,7 +69,6 @@ public class GroupChatServer implements Runnable
         try
         {
             Socket cliSock = null;
-
             ServerSocket servSock = new ServerSocket(Integer.parseInt(args[0]));
 
             while (true)
