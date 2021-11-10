@@ -114,7 +114,7 @@ class GroupChatClient implements Runnable
                 }
 
                 //Write line to user
-                System.out.println(args[2] +": " + line);
+                System.out.println("Name: " + line);
             }
         }
         catch (Exception e)

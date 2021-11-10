@@ -4,52 +4,56 @@ import java.util.*;
 
 public class GroupChatServer implements Runnable
 {
-    private socket clientSock;
+    private Socket clientSock;
+
     private static List<PrintWriter> clientList;
 
     public GroupChatServer(Socket sock)
     {
         clientSock = sock;
+        clientList = new ArrayList<PrintWriter>();
     }
 
     public static synchronized boolean addClient(PrintWriter toClientWriter)
     {
-        return(clientList.add(toClientWriter));
+        return clientList.add(toClientWriter);
     }
 
-    public static synchronized boolean removeClient()
+    public static synchronized boolean removeClient(PrintWriter toClientWriter)
     {
-        return(clientList.remove(toClientWriter));
+        return clientList.remove(toClientWriter);
     }
 
     public static synchronized void relayMessage(PrintWriter fromClientWriter, String mesg)
     {
-        //Iterate through the client list and relay message to each client (but not to the sender)
+        for (PrintWriter p : clientList)
+        {
+            if (!p.equals(fromClientWriter))
+                p.println(mesg);
+        }
     }
 
     public void run()
     {
-        //Read from the client and relay to other clients
-        try
+        try 
         {
-            //Prepare to read from socket
+            BufferedReader fromSockReader = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
             
-            //Get client name
+            //Get the client name
 
-            //Prepare to write to socket with auto flush on
+            PrintWriter toSockWriter = new PrintWriter(clientSock.getOutputStream(), true);
 
-            //Add this client to the active client list
+            addClient(toSockWriter);
 
-            //Keep doing unitl EOF
             while (true)
             {
-                //Read a line from the client
-
-                //If null, client quit, break loop
-
-                //Else, relay the line to all active clients
+                String line = fromSockReader.readLine();
+                if (line == null)
+                {
+                    break;
+                }
+                relayMessage(toSockWriter, line);
             }
-            //Done with the client, remove it from the client list
         }
         catch (Exception e)
         {
@@ -57,30 +61,37 @@ public class GroupChatServer implements Runnable
             System.exit(1);
         }
     }
-
-    /*
-	 * The group chat server program starts from here.
-	 * This main thread accepts new clients and spawns a thread for each client
-	 * Each child thread does the stuff under the run() method
-	 */
+    
     public static void main(String[] args)
     {
         if (args.length != 1)
         {
             System.out.println("Usage: java GroupChatServer <server port>");
-            System.exit(1);
+            System.exit(0);
         }
 
         try
         {
-            //Create server socket with given port
+            Socket cliSock = null;
 
-            //Keep accepting/serving cleints
+            ServerSocket servSock = new ServerSocket(Integer.parseInt(args[0]));
+
             while (true)
             {
-                //Wait to accept another client
+                try 
+                {
+                    System.out.println("Waiting for a client...");
+                    cliSock = servSock.accept();
+                    System.out.println("New client connected");
 
-                //Spawn a thread to read/relay messages from this client
+                    Thread child = new Thread(new GroupChatServer(cliSock));
+                    child.start();
+                }
+                catch (Exception e)
+                {
+                    System.out.println(e);
+                    System.exit(1);
+                }
             }
         }
         catch (Exception e)
