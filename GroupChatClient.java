@@ -23,15 +23,12 @@ class GroupChatClient implements Runnable
         {
             while (true)
             {
-                //Read line from user
                 String line = fromUserReader.readLine();
 
-                //Check for null and end if null
                 if (line == null)
                     break;
                 
-                    //Write lines to socket
-                    toSockWriter.println(getClientName() + ": " + line);
+                toSockWriter.println(getClientName() + ": " + line);
             }
         }
         catch (Exception e)
@@ -39,8 +36,6 @@ class GroupChatClient implements Runnable
             System.out.println(e);
             System.exit(1);
         }
-
-        //End the other thread
         System.exit(0);
     }
 
@@ -56,14 +51,12 @@ class GroupChatClient implements Runnable
 
     public static void main(String[] args)
     {
-        //Check argument is correct
         if (args.length != 3)
         {
             System.out.println("Usage: java GroupChatCleint <host> <por> <name>");
             System.exit(1);
         }
 
-        //Connect to server at host and port #
         Socket sock = null;
         try
         {
@@ -76,14 +69,10 @@ class GroupChatClient implements Runnable
             System.exit(1);
         }
 
-        //Thread to read from user and write to socket
         try
         {
-            //Prep to write to socket with autoflush
             PrintWriter toSockWriter = new PrintWriter(sock.getOutputStream(), true);
-            //Prepare to read from keyboard
             BufferedReader fromUserReader = new BufferedReader(new InputStreamReader(System.in));
-            //Spawn thread to read from user and write to socket
             Thread child = new Thread(new GroupChatClient(fromUserReader, toSockWriter, args[2]));
             child.start();
         }
@@ -93,27 +82,19 @@ class GroupChatClient implements Runnable
             System.exit(1);
         }
 
-        //Read from socket and display message to user
         try
         {
-            //Prep to read from socket
             BufferedReader fromSocketReader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-            //Keep looping until server is finished
             while (true)
             {
-                //Read line from socket
                 String line = fromSocketReader.readLine();
 
-                //If null EOF
                 if (line == null)
                 {
-                    //Tell user to quit
                     System.out.println("*** Server quit");
                     break;
                 }
-
-                //Write line to user
                 System.out.println(line);
             }
         }
@@ -122,8 +103,6 @@ class GroupChatClient implements Runnable
                 System.out.println(e);
                 System.exit(1);
             }
-
-            //End other thread 
             System.exit(0);
     }
 }
