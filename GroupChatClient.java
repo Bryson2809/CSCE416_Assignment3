@@ -31,7 +31,7 @@ class GroupChatClient implements Runnable
                     break;
                 
                     //Write lines to socket
-                    toSockWriter.println(line);
+                    toSockWriter.println(getClientName() + ": " + line);
             }
         }
         catch (Exception e)
@@ -114,7 +114,7 @@ class GroupChatClient implements Runnable
                 }
 
                 //Write line to user
-                System.out.println("Name: " + line);
+                System.out.println(line);
             }
         }
         catch (Exception e)

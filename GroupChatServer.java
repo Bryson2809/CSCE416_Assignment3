@@ -5,23 +5,21 @@ import java.util.*;
 public class GroupChatServer implements Runnable
 {
     private Socket clientSock;
-
-    private static List<PrintWriter> clientList;
+    private static ArrayList<PrintWriter> clientList = new ArrayList<PrintWriter>();
 
     public GroupChatServer(Socket sock)
     {
         clientSock = sock;
-        clientList = new ArrayList<PrintWriter>();
     }
 
     public static synchronized boolean addClient(PrintWriter toClientWriter)
     {
-        return clientList.add(toClientWriter);
+        return (clientList.add(toClientWriter));
     }
 
     public static synchronized boolean removeClient(PrintWriter toClientWriter)
     {
-        return clientList.remove(toClientWriter);
+        return (clientList.remove(toClientWriter));
     }
 
     public static synchronized void relayMessage(PrintWriter fromClientWriter, String mesg)
@@ -38,8 +36,6 @@ public class GroupChatServer implements Runnable
         try 
         {
             BufferedReader fromSockReader = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
-            
-            //Get the client name
 
             PrintWriter toSockWriter = new PrintWriter(clientSock.getOutputStream(), true);
 
@@ -54,6 +50,7 @@ public class GroupChatServer implements Runnable
                 }
                 relayMessage(toSockWriter, line);
             }
+            removeClient(toSockWriter);
         }
         catch (Exception e)
         {
