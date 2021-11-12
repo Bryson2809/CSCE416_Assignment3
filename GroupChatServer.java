@@ -5,7 +5,7 @@ import java.util.*;
 public class GroupChatServer implements Runnable
 {
     private Socket clientSock;
-    private static ArrayList<PrintWriter> clientList = new ArrayList<PrintWriter>();
+    private static List<PrintWriter> clientList = new ArrayList<PrintWriter>();
 
     public GroupChatServer(Socket sock)
     {
