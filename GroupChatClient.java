@@ -3,9 +3,7 @@ import java.io.*;
 
 class GroupChatClient implements Runnable
 {
-    //Read from keybaord
     private BufferedReader fromUserReader;
-    //Writing to socket
     private PrintWriter toSockWriter;
 
     private String clientName;
